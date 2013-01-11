@@ -1,0 +1,1468 @@
+Script started on Wed Nov 28 14:50:35 2012
+[?1034hbash-3.2$ cat app.cpp
+//Phillip Walker
+//Data Structures
+//11-18-2012
+//###############
+
+#include "List.h"
+#include <fstream>
+
+int main(){
+  
+  //#########
+  //Create variables
+  //#########
+  
+  //Current Node 
+  //Node *curr = NULL;
+  
+  //newNode holder
+  Node *newNode = NULL;
+
+  //List pointer
+  List *list1 = NULL;
+
+  //second list
+  List *list2 = NULL;
+
+  List *list3 = NULL;
+
+  //Demonstration var
+  char demo='n';
+
+  //reverse copy bool
+  bool copyValue=true;
+
+  //Social Security to identify which record to insert before/after
+  int social;
+  
+  //Create list & check memory alloc
+  try{
+    list1 = new List;
+  }catch(bad_alloc& c){
+    cerr<<"Bad memory allocation for list"<<endl;
+  }
+  
+  //##########
+  //Open File
+  //##########
+
+  ifstream INFILE;
+  ofstream OUTFILE;
+
+  string method;
+  char terminate='n';
+
+  cout << "Please enter a file name or - for terminal input"<<endl;
+  cin >> method;
+  
+  //Opening file                                                             
+  if(method != "-"){
+    INFILE.open(method.c_str());
+  }
+      
+  //error checking if file didnt open right                                                 
+  if(!INFILE){
+    cout << "ERROR UNABLE TO OPEN FILE!"<<endl;
+    return 1;
+  }
+  
+  //##########
+  //Build list
+  //##########
+  
+  //No. nodes in list
+  while(terminate != 'y' || INFILE.eof()){
+    
+    //Allocate Node memory to newNode 
+    try{
+      
+      if(method == "-"){
+	newNode = new Node(new Student());
+      }
+      else{
+	newNode = new Node(new Student(INFILE));
+      }
+      
+    }catch(bad_alloc& c){
+      //Test allocation
+
+      cerr<<"bad memory allocation for Node"<<endl;
+      return 1;
+      
+    }
+    
+    //Create list/add node
+    list1->append(newNode);
+
+    //Ask user to quit after creating atleast 2 students                                      
+    if(method == "-"){
+
+      //ask to exit or not
+      cout << "Would you like to exit? (y/n)"<<endl;
+      cin>> terminate;
+
+    }else if(!INFILE.good()){
+
+      break;
+
+    }
+    
+  }
+  
+  //################
+  //Demo list functions below
+  //################
+
+  //Demo display Descending
+  cout << "Done"<<endl;
+  cout<<"Displaying list1 in descending order"<<endl;
+  
+  //Recursively output list
+  list1->displayDescending(list1->getTail());
+  
+  //Demo add new record
+  cout << "Would you like to add a new student record node? (y/n)"<<endl;
+  cin >> demo;
+  
+  //if yes
+  if(demo == 'y'){
+    
+        //Allocate Node memory to newNode 
+    try{
+      
+      newNode = new Node(new Student());
+      
+    }catch(bad_alloc& c){
+      //Test allocation
+      
+      cerr<<"bad memory allocation for Node"<<endl;
+      return 1;
+      
+    }
+
+    //add to list
+    list1->append(newNode);
+    
+  }
+  
+  //Demo displaying Ascending
+  cout << "Display list1 in ascending order: "<<endl;
+  
+  //Display head to tail
+  list1->displayAscending();
+
+  //demo insert before
+  cout<<"\nWould you like to add a record before a specific record?"<<endl; 
+  cin >> demo;
+
+  
+  //if yes
+  if(demo == 'y'){
+
+    //Ask for a social secuirty as identifier
+    cout<<"Please supply a social security number"<<endl;
+    cin >> social;
+    
+    //alloc memory
+    try{
+      
+      //create new node
+      newNode = new Node(new Student());
+
+    }catch(bad_alloc& c){
+      //Test
+
+      cerr<<"bad memory allocation for Node"<<endl;
+      return 1;
+
+    }
+    
+    //Insert a new student record before specific record
+    list1->insertBeforeNode(newNode, social);
+
+    
+    //display ascending
+    cout << "Displaying updated list"<<endl;
+    list1->displayAscending();
+      
+  }  
+  
+  cout << "Would you like to insert a record after any specific record?"<<endl; 
+  cin >> demo;
+  
+  if(demo == 'y'){
+    
+    //Ask for a social secuirty as identifier 
+    cout<<"Please supply a social security number"<<endl;
+    cin >> social;
+    
+    try{
+      
+      newNode = new Node(new Student());
+
+    }catch(bad_alloc& c){
+      cerr<<"Bad memory allocated for newNode insertBefore"<<endl;
+      return 1;
+
+    }
+
+    list1->insertAfterNode(newNode, social);
+
+    //display updated list
+    list1->displayAscending();
+
+  }//if
+
+  //Demo delete record
+  cout << "Would you like to delete a node?"<<endl;
+  cin >> demo;
+
+  if(demo == 'y'){
+
+    cout << "Please specify which record to delete with the social security code"<<endl;
+    cin >> social;
+    
+    //delete node
+    list1->deleteNode(social);
+
+    cout << "Displaying updated list"<<endl;
+    list1->displayAscending();
+
+  }
+
+
+  //Demo create new list with copy constructor
+  cout<<"\nWould you like to create a copy of the records into a new list? (y/n)"<<endl;
+  cin >> demo;
+  
+  if(demo == 'y'){
+
+    //allocate and test memory
+    try{
+      list2 = new List(list1);
+    }catch(bad_alloc& c){
+      cerr << "Bad memory allocation for new list"<<endl;
+      return 1;
+    }
+
+    cout << "\nDisplaying list 2"<<endl;
+    list2->displayAscending();
+
+  }
+
+  //Demo create new list in reverse with bool value
+  cout << "Would you like to copy list2 in a special way!? (y/n)"<<endl;
+  cin >> demo;
+
+  if(demo == 'y'){
+    
+    cout << "Would you like to copy the list in reverse order (y)  or normal order (n)?"<<endl;
+    cin >> demo;
+
+    if(demo == 'y'){
+
+      copyValue = false;
+      
+      //allocate and test
+      try{
+	list3 = new List(list2, copyValue);
+      }catch(bad_alloc& c){
+	cerr << "Bad memory allocation for list 3"<<endl;
+	return 1;
+      }
+
+      cout << "Displaying list 3 (reversed list 2)"<<endl;
+      list3->displayAscending();
+
+    }else{
+
+      //allocate and test
+      try{
+	list3 =new List(list2);
+      }catch(bad_alloc&c){
+	cerr <<"Bad memory allocation for list 3"<<endl;
+	return 1;
+      }
+      
+      //display
+      cout << "Dispaying list 3 (not reversed of list 2)"<<endl;
+      list3->displayAscending();
+    
+    }
+  }//if
+
+  cout << "\nEnd of program"<<endl;
+
+  return 0;
+
+}
+
+
+
+
+
+
+
+bash-3.2$ cat Student.h
+#ifndef STUDENT_H
+#define STUDENT_H
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Student{
+
+
+ private:
+  //Data Members                                                                               
+  string fname;
+  string lname;
+  char mi;
+  long socialSecurity;
+  int age;
+
+
+ public:
+  //default constructor for terminal input                                                     
+  Student();
+
+  //constructor                                                                                
+  Student(ifstream&);
+
+  //display items                                                                              
+  void display(ofstream&);
+  
+  //display items                                                                              
+  void display();
+
+  //accessors                                                                                  
+  string getFname();
+  string getLname();
+  char getMi();
+  long getSocial();
+  int getAge();
+
+};
+#endif
+ 
+bash-3.2$ cat Student.cpp 
+#include "Student.h"
+
+//defualt constructor                                                                           
+Student::Student(){
+
+  //Get first name                                                                             
+  cout<<"First Name: ";
+  cin >> fname;
+
+  //Get last name                                                                              
+  cout << "Last Name: ";
+  cin >> lname;
+
+  //Get middle initial                                                                         
+  cout<<"Middle Initial: ";
+  cin >> mi;
+
+  cout << "Social Security: ";
+  cin >> socialSecurity;
+
+  cout << "Age: ";
+  cin >> age;
+
+
+}
+
+//constructor                                                                                   
+Student::Student(ifstream &in){
+
+  in >> fname;
+
+  in >> lname;
+
+  in >> mi;
+
+  in >> socialSecurity;
+
+  in >> age;
+
+  in.ignore();
+}
+
+
+//Display the node's student object data members                                                
+void Student::display(ofstream &out){
+
+  out << "Information of Student: \n\n" <<  "First name: " << fname << "\n" <<"Middle Initial:\
+ "<< mi << "\n" <<"Last name: "<< lname << "\n" <<"Social Security: " << socialSecurity << "\n"\
+      << "Age: "<< age << "\n" <<endl;
+
+}
+
+void Student::display(){
+  cout << "Information of Student: \n\n" <<  "First name: " << fname << "\n" <<"Middle Initial\
+: "<< mi << "\n" <<"Last name: "<< lname << "\n" <<"Social Security: " << socialSecurity << "\n\
+" << "Age: "<< age << "\n"<<endl;
+}
+
+
+//Get the first name of the student                                                             
+string Student::getFname(){
+  return(fname);
+}
+
+//Get the last name of the student                                                              
+string Student::getLname(){
+  return(lname);
+}
+
+
+//get middle initial                                                                            
+char Student::getMi(){
+  return(mi);
+}
+
+//get social security number                                                                    
+long Student::getSocial(){
+  return(socialSecurity);
+}
+
+//get age                                                                                       
+int Student::getAge(){
+  return(age);
+}
+ 
+bash-3.2$ cat Node.h
+#ifndef NODE_H
+#define NODE_H
+
+#include "Student.h"
+
+#include <iostream>
+#include <string>
+
+
+using namespace std;
+
+
+class Node{
+
+ public:
+  
+  //Default constructor
+  Node();
+  
+  //Constructor
+  Node(Student*);
+  
+  //Destructor
+  ~Node();
+
+  //Set next
+  void setNext(Node*);
+  
+  //Set prev
+  void setPrev(Node*);
+  
+  //Get next node
+  Node *getNext();
+
+  //Get prev node
+  Node *getPrev();
+
+  //Get data
+  Student* getData();
+  
+
+ private:
+
+  //Pointer var
+  Node *next_;
+  Node *prev_;
+  
+  //Data var
+  Student* data_;
+
+
+
+};
+#endif
+bash-3.2$ cat n[KNode.cpp 
+#include "Node.h"
+
+//Create defualt constructor
+
+Node::Node(){
+  
+}
+
+//Constructor
+//@param item: data item value
+
+Node::Node(Student* item){
+  
+  //Setting data var of node
+  data_ = item;
+  
+  //Set pointer to NULL
+  next_ = NULL;
+  prev_ = NULL;
+
+}
+
+//Destructor
+
+Node::~Node(){
+  
+  delete data_;
+  delete next_;
+  delete prev_;
+
+}
+
+//getNext node
+
+Node* Node::getNext(){
+
+  return next_;
+
+}
+
+//getPrev node
+Node* Node::getPrev(){
+  
+  return prev_;
+
+}
+
+//SetPrev pointer
+void Node::setPrev(Node* newNode){
+
+  //Point to prev
+  prev_ = newNode;
+
+}
+
+//SetNext pointer
+
+void Node::setNext(Node* newNode){
+
+  //Point to next node
+  next_ = newNode;
+
+}
+
+//Get node data 
+
+Student* Node::getData(){
+  
+  return data_;
+  
+}
+    
+bash-3.2$ a[Kcat List.cpp[K[K[Kh
+#ifndef LIST_H
+#define LIST_H
+
+#include "Node.h"
+
+class List{
+
+ private:
+  
+  //Node pointers
+
+  //First node pointer
+  Node* head_;
+  
+  //Last node pointer
+  Node* tail_;
+
+  //Iterating list nodes
+  Node* currNode;
+
+  //private methods
+
+  //Append to end of list
+  void appendLastNode(Node*);
+
+  //Iterate down list
+  Node* iterateDown();
+
+  //Itrate up list
+  Node* iterateUp();
+
+  //Dynamically create new node
+  Node* createNewNode(Student*);
+
+
+ public:
+
+  //Default constructor
+  List();
+
+  //Copy constructor regular list
+  List(List*);
+  
+  //Copy constructor reversed list
+  List(List*, bool);
+
+  //Destructor
+  ~List();
+
+  //isEmpty checks if the list is empty (true) or not (false)
+  bool isEmpty();
+
+  //tail accessor
+  Node* getTail();
+
+  //Append function
+  void append(Node*);
+
+  //insert node before node
+  void insertBeforeNode(Node*, int x);
+
+  //insert node before node
+  void insertAfterNode(Node*, int x);
+  
+  //insert to head of list
+  void insertFirstNode(Node*);
+
+  //Delete a node
+  void deleteNode(int);
+  
+  //Traverse Forward
+  void displayAscending();
+
+  //Traversing Backward
+  void displayDescending(Node*);
+  
+  //Return length of list
+  int getNumNodes();
+  
+  //Return next Node in list
+  Node* newIteratorHead();
+
+  //Return new tail iterator
+  Node* newIteratorTail();
+
+
+};
+#endif
+bash-3.2$ cat List.cpp
+#include "List.h"
+
+//Default constructor
+
+List::List(){
+
+  head_ = NULL;
+  tail_ = NULL;  
+
+}
+
+//Destructor
+
+List::~List(){
+
+  //delete nodes
+  Node* curr = head_;  
+
+  //traverse and delete all
+  while(curr != NULL){
+    
+    deleteNode(curr->getData()->getSocial());
+    curr = curr->getNext();
+    
+  }
+
+  //delete pointers
+  delete tail_;
+  delete head_;
+
+}
+
+//Copy Constructor
+
+List::List(List* A){
+  
+  //curr node
+  Node* n;
+  
+  //data var
+  Student* data;
+  
+  //Begin iterating list
+  n = A->newIteratorHead();
+  cout << 1 << endl;
+  //While node exists
+  while(n){
+    cout<<2<<endl;
+    //extract data 
+    data = n->getData();
+    cout << 3<<endl;
+    //add newnode to list
+    append(createNewNode(data));
+    cout << 4<<endl;
+    //iterate node
+    n = A->iterateDown();
+    cout << 5<<endl;
+  }//end while
+}
+
+//Copy Constructor with reverse option
+//
+//@param A: list to copy
+//@aparam flag: true regular way, false reverse way
+
+List::List(List* A, bool flag){
+
+  Node* n; 
+
+  Student* data; 
+  
+  //if reversed
+  if(flag == false){
+    
+    //begin iterating list
+    n = A->newIteratorTail();
+    
+    //While node exists
+    while(n){
+      
+      //extract data 
+      data = n->getData();
+      
+      //add newnode to list
+      append(createNewNode(data));
+
+      //iterate node
+      n = A->iterateUp();
+     
+    }//end while
+    
+  }else{
+    
+    //get head
+    n = A->newIteratorHead();
+
+     //While node exists
+    while(n){
+      
+      //extract data 
+      data = n->getData();
+      
+      //add newnode to list
+      append(createNewNode(data));
+      
+      //iterate node
+      n = A->iterateDown();
+      
+    }//end while
+  }//end if
+}
+
+
+//Initialize iteration for a list
+
+Node* List::newIteratorHead(){
+  
+  //access head 
+  currNode = head_;
+  
+  //return head node
+  return currNode;
+
+}
+
+//new Iterator starting at tail
+
+Node* List::newIteratorTail(){
+
+  //currNode starts at tail
+  currNode = tail_;
+
+  //return start at tail
+  return currNode;
+
+
+}
+
+//Iterate down node list
+ 
+Node* List::iterateDown(){
+   
+  //interate next node
+  currNode = currNode->getNext();
+
+  //return next node
+  return currNode;
+
+}
+
+//Iterate up node list 
+
+Node* List::iterateUp(){
+
+  //iterate prev node
+  currNode = currNode->getPrev();
+
+  //return prev node
+  return currNode;
+
+}
+
+//createNewNode 
+//@para x: data value of node
+//Dynamincally create a new Node with
+//data. Return node to list specifically for copying
+
+Node* List::createNewNode(Student* data){
+  
+  //temporary node pointer
+  Node* tmpNode;
+
+  //create newnode
+  tmpNode = new Node(data);
+  
+  //return to list
+  return tmpNode;
+
+}
+
+
+//isEmpty returns true (list empty)
+//false (list not empty)
+
+bool List::isEmpty(){
+
+  //if tail_ and head_ == NULL
+  if(tail_ == NULL && head_ == NULL){
+
+    //Empty
+    return true;
+
+  }else{
+
+    //Not empty
+    return false;
+
+  }
+}
+
+//Append node to tail
+//@param newNode: node to add
+
+void List::appendLastNode(Node *newNode){
+  
+  //newNode next point to NULL --> new tail node
+  newNode->setNext(NULL);
+  
+  //Points newNode prev pointer to old tail node
+  newNode->setPrev(tail_);
+  
+  //set old tail node to new tail node
+  tail_->setNext(newNode);
+  
+  //tail_ = new tail node
+  tail_ = newNode;
+  
+}
+
+// append a new node
+//
+//@param newNode: new node to add
+//check if empty. If true, insert new node as first
+
+void List::append(Node *newNode){
+
+  //If list empty
+  if(isEmpty()){
+    
+    //Insert node
+    insertFirstNode(newNode);
+    
+  }else{
+    
+    //append to end
+    appendLastNode(newNode);
+    
+  }//end if
+}
+
+//Append First Node
+//
+//@param newNode: node to add
+// if empty true, set head & tail else
+//switch head and new node pointers
+
+void List::insertFirstNode(Node *newNode){
+  
+  if(isEmpty()){
+
+    //do something
+    head_ = newNode;
+    tail_ = newNode;
+
+  }else{
+
+    //old head to newNode
+    head_->setPrev(newNode);
+
+    //newNode to frm head
+    newNode->setNext(head_);
+    
+    // head to newnode
+    head_ = newNode;
+    
+    //Head node to NULL
+    newNode->setPrev(NULL);
+  
+  
+  }
+  
+}
+
+//Insert before designated node
+//
+//@param newNode: The node to be inserted
+//@param x: value of social security node to insert before
+
+void List::insertBeforeNode(Node* newNode, int x){
+  
+  //begin at head
+  Node* current = head_;
+  
+  //traverse the list until we find correct node
+  while(current->getData()->getSocial() != x){
+    
+    current = current->getNext();
+ 
+  }  
+   
+  //Point newNode next to current
+  newNode->setNext(current);
+
+  //Point newNode prev to current->getPrev()
+  newNode->setPrev(current->getPrev());
+
+  //Now connect current->getPrev() to newNode
+  current->getPrev()->setNext(newNode);
+
+  //Set current prev to newNode connecting current to newNode
+  current->setPrev(newNode);
+  
+}
+
+//Insert after designated node
+//@param newNode: The node to be inserted
+//@param x: value of social security node to insert aftr
+
+void List::insertAfterNode(Node* newNode, int x){
+  
+  //begin at head
+  Node* current = head_;
+  
+  ///traverse list until we find correct node
+  while(current->getData()->getSocial() != x){
+    
+    //increment node
+    current = current->getNext();
+  
+  }
+  
+  //newNode next point to current next
+  newNode->setNext(current->getNext());
+
+  //newNode prev point to current
+  newNode->setPrev(current);
+
+  //current next prev set to newNode
+  current->getNext()->setPrev(newNode);
+  
+  //current next to newNode
+  current->setNext(newNode);
+  
+}
+
+
+//Delete a specific node
+//@param x: Node social secuirty to delete
+
+void List::deleteNode(int x){
+  
+  //Start at head
+  Node* curr = head_;
+  
+  //head storage pointer before deleting
+  Node* store;
+
+  //if deleting first node case
+  if(head_->getData()->getSocial() == x){
+    
+    //store node
+    store = head_;
+
+    //set head
+    head_ = curr->getNext();
+
+    //new head setNext
+    head_->setNext(head_->getNext());
+    
+    //new head setPrev
+    head_->setPrev(NULL);
+
+    //Delete fmr head
+    delete store;
+        
+    
+  }else if(tail_->getData()->getSocial() == x){   
+    //Delete the last node
+
+    //store delete node
+    store = curr;
+
+    //curr to 2nd to last (new tail)
+    curr = tail_->getPrev();
+
+    //tail pointer to 2nd to last (new tail)
+    tail_ = tail_->getPrev();
+    
+    //set new tail next NULL
+    tail_->setNext(NULL);
+
+    //new tail to new 2nd to last 
+    tail_->setPrev(curr->getPrev());
+
+    //set new 2nd to last next to new tail
+    curr->getPrev()->setNext(tail_);
+    
+    //delete tail node
+    delete store;    
+
+  }else{
+    
+    //while not correct node
+    while(curr->getData()->getSocial() != x){
+      
+      //iterate
+      curr = curr->getNext();
+      
+    }//end while
+    
+    //store delete node
+    store = curr;
+    
+    //make node after delete node prev pointer point to node before
+    //delete node
+    curr->getNext()->setPrev(curr->getPrev());
+    
+    //connect node after store to node prev to store
+    curr->getPrev()->setNext(curr->getNext()); 
+    
+  }//end else
+  
+}
+
+//displayAscending
+//display all nodes from head to tail 
+
+void List::displayAscending(){
+
+  //current node
+  Node *curr;
+
+  //begin at head
+  curr = head_;
+  
+  //while not end of list
+  while(curr != NULL){
+
+    //display data
+    curr->getData()->display();
+    
+    //iterate to next node
+    curr = curr->getNext();
+    
+  }//end while
+}
+
+
+//displayDescending
+//Implemented recursively
+//
+//@param preNode: prev node of each node
+
+void List::displayDescending(Node* prevNode){
+
+  //if top of list
+  if(prevNode->getPrev() == NULL){
+    
+    //display head
+    prevNode->getData()->display();
+    
+  }else{
+    //continue up list
+
+    //display data
+    prevNode->getData()->display();
+    
+    //iterate up list
+    displayDescending(prevNode->getPrev());
+  
+  }//end if
+}
+
+//getNumNodes
+//return the length of the list
+
+int List::getNumNodes(){
+
+  //curr node
+  Node* curr;
+  
+  //count nodes
+  int i=0;
+  
+  //begin at head
+  curr = head_;
+ 
+  //while node exists
+  while(curr->getNext() != NULL){
+
+    //increment i for each node
+    i++;
+
+    //traverse list
+    curr = curr->getNext();
+
+  }//end while
+
+  //return total number of nodes
+  return i;
+
+}
+
+//Get tail pointer
+
+Node* List::getTail(){
+
+  return tail_;
+
+}
+
+bash-3.2$ ./a.out 
+Please enter a file name or - for terminal input
+studentRecords.dat
+Done
+Displaying list1 in descending order
+Information of Student: 
+
+First name: Cid
+Middle Initial: T
+Last name: Lagher
+Social Security: 2938848393
+Age: 90
+
+Information of Student: 
+
+First name: Kristin
+Middle Initial: A
+Last name: Walker
+Social Security: 29993939
+Age: 10
+
+Information of Student: 
+
+First name: Kurt
+Middle Initial: G
+Last name: Walker
+Social Security: 292929292
+Age: 100
+
+Information of Student: 
+
+First name: Christine
+Middle Initial: R
+Last name: Papadakis
+Social Security: 191919119
+Age: 80
+
+Information of Student: 
+
+First name: Phillip
+Middle Initial: D
+Last name: Walker
+Social Security: 19273839
+Age: 12
+
+Would you like to add a new student record node? (y/n)
+y
+First Name: Kara Mcwiliams    liams           
+Last Name: McWilliams
+Middle Initial: F
+Social Security: 384848
+Age: 38
+Display list1 in ascending order: 
+Information of Student: 
+
+First name: Phillip
+Middle Initial: D
+Last name: Walker
+Social Security: 19273839
+Age: 12
+
+Information of Student: 
+
+First name: Christine
+Middle Initial: R
+Last name: Papadakis
+Social Security: 191919119
+Age: 80
+
+Information of Student: 
+
+First name: Kurt
+Middle Initial: G
+Last name: Walker
+Social Security: 292929292
+Age: 100
+
+Information of Student: 
+
+First name: Kristin
+Middle Initial: A
+Last name: Walker
+Social Security: 29993939
+Age: 10
+
+Information of Student: 
+
+First name: Cid
+Middle Initial: T
+Last name: Lagher
+Social Security: 2938848393
+Age: 90
+
+Information of Student: 
+
+First name: Kara
+Middle Initial: F
+Last name: McWilliams
+Social Security: 384848
+Age: 38
+
+
+Would you like to add a record before a specific record?
+y
+Please supply a social security number
+191919119
+First Name: Yunte
+Last Name: Gahlo
+Middle Initial: F
+Social Security: 3884884
+Age: 3 98
+Displaying updated list
+Information of Student: 
+
+First name: Phillip
+Middle Initial: D
+Last name: Walker
+Social Security: 19273839
+Age: 12
+
+Information of Student: 
+
+First name: Yunte
+Middle Initial: F
+Last name: Gahlo
+Social Security: 3884884
+Age: 98
+
+Information of Student: 
+
+First name: Christine
+Middle Initial: R
+Last name: Papadakis
+Social Security: 191919119
+Age: 80
+
+Information of Student: 
+
+First name: Kurt
+Middle Initial: G
+Last name: Walker
+Social Security: 292929292
+Age: 100
+
+Information of Student: 
+
+First name: Kristin
+Middle Initial: A
+Last name: Walker
+Social Security: 29993939
+Age: 10
+
+Information of Student: 
+
+First name: Cid
+Middle Initial: T
+Last name: Lagher
+Social Security: 2938848393
+Age: 90
+
+Information of Student: 
+
+First name: Kara
+Middle Initial: F
+Last name: McWilliams
+Social Security: 384848
+Age: 38
+
+Would you like to insert a record after any specific record?
+y
+Please supply a social security number
+292929292
+First Name: Groupo
+Last Name: Troupo
+Middle Initial: 3 R
+Social Security: 848848599  
+Age: 48
+Information of Student: 
+
+First name: Phillip
+Middle Initial: D
+Last name: Walker
+Social Security: 19273839
+Age: 12
+
+Information of Student: 
+
+First name: Yunte
+Middle Initial: F
+Last name: Gahlo
+Social Security: 3884884
+Age: 98
+
+Information of Student: 
+
+First name: Christine
+Middle Initial: R
+Last name: Papadakis
+Social Security: 191919119
+Age: 80
+
+Information of Student: 
+
+First name: Kurt
+Middle Initial: G
+Last name: Walker
+Social Security: 292929292
+Age: 100
+
+Information of Student: 
+
+First name: Groupo
+Middle Initial: R
+Last name: Troupo
+Social Security: 8488485
+Age: 48
+
+Information of Student: 
+
+First name: Kristin
+Middle Initial: A
+Last name: Walker
+Social Security: 29993939
+Age: 10
+
+Information of Student: 
+
+First name: Cid
+Middle Initial: T
+Last name: Lagher
+Social Security: 2938848393
+Age: 90
+
+Information of Student: 
+
+First name: Kara
+Middle Initial: F
+Last name: McWilliams
+Social Security: 384848
+Age: 38
+
+Would you like to delete a node?
+y
+Please specify which record to delete with the social security code
+29993939
+Displaying updated list
+Information of Student: 
+
+First name: Phillip
+Middle Initial: D
+Last name: Walker
+Social Security: 19273839
+Age: 12
+
+Information of Student: 
+
+First name: Yunte
+Middle Initial: F
+Last name: Gahlo
+Social Security: 3884884
+Age: 98
+
+Information of Student: 
+
+First name: Christine
+Middle Initial: R
+Last name: Papadakis
+Social Security: 191919119
+Age: 80
+
+Information of Student: 
+
+First name: Kurt
+Middle Initial: G
+Last name: Walker
+Social Security: 292929292
+Age: 100
+
+Information of Student: 
+
+First name: Groupo
+Middle Initial: R
+Last name: Troupo
+Social Security: 8488485
+Age: 48
+
+Information of Student: 
+
+First name: Cid
+Middle Initial: T
+Last name: Lagher
+Social Security: 2938848393
+Age: 90
+
+Information of Student: 
+
+First name: Kara
+Middle Initial: F
+Last name: McWilliams
+Social Security: 384848
+Age: 38
+
+
+Would you like to create a copy of the records into a new list? (y/n)
+y
+1
+2
+3
+Segmentation fault: 11
+bash-3.2$ exit
+exit
+
+Script done on Wed Nov 28 14:52:53 2012
