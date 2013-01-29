@@ -1,0 +1,52 @@
+//Phillip Walker
+//Rebellion Research Code
+
+#include "Node.h"
+
+using namespace std;
+
+
+int main(){
+
+  string word;
+
+  cout << "Please supply a word"<<endl;
+  cin >> word;
+  
+  int width = 2;
+  int height = word.length();
+  cout << "word length: " << word.length()<<endl;
+  
+  //width x height
+  char records[height][width];
+
+
+
+  //check matrix layout
+  
+  //start w/ min 1 count for each
+  
+  for(int i=0; i<height; i++){
+    for(int j=1; j<width; j++){
+
+      //height change, width stays at one for first bucket
+      records[i][j] = word[i];
+
+      //fill right most bucket the width which is set
+      records[i][width] = 1+'0';
+      
+      //test
+      cout << records[i][j];
+      cout << records[i][width];
+      
+    }
+    cout <<endl;
+  }
+
+  //Check letter occurences
+    
+  
+
+  return 0;
+
+}
