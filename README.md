@@ -1,0 +1,1 @@
+Algorithm Fun is a compilation of algorithms and data structures that I have been practicing programming during my senior year of Computer Science.
