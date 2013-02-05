@@ -83,7 +83,6 @@ bool comp(char a, char b){
 //
 //@param infix: infex expression
 
-
 char* infixToPostFix(string infix){
 
   Stack *product;
