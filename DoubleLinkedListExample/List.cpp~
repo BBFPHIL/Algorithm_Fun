@@ -347,6 +347,8 @@ void List::deleteNode(int x){
   //head storage pointer before deleting
   Node* store=NULL;
   
+  //cout << "*"<<endl;
+
   //if deleting first node case
   if(head_->getData()->getSocial() == x){
     
